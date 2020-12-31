@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ChessEngine/chess_utils"
 	"ChessEngine/tree_utils"
 	"fmt"
 	"math"
@@ -9,7 +10,9 @@ import (
 func main() {
 
 	fmt.Println(tree_utils.Hello())
-	fmt.Println(tree_utils.Minimax())
+
+	piece := chess_utils.NewPiece("ROOK", 0, 5, 5)
+	fmt.Println(chess_utils.ReturnChessNot(*piece))
 
 	listeners := [5]int{11, 18, 20, 21, 23}
 	towers := [4]int{1, 2, 13, 22}
@@ -57,11 +60,6 @@ func main() {
 
 		distances = append(distances, int(math.Min(float64(dist_1), float64(dist_2))))
 
-		fmt.Println(dist_1)
-		fmt.Println(dist_2)
-
 	}
-
-	fmt.Println(distances)
 
 }
