@@ -14,6 +14,12 @@ func main() {
 	piece := chess_utils.NewPiece("ROOK", 0, 5, 5)
 	fmt.Println(chess_utils.ReturnChessNot(*piece))
 
+	board := chess_utils.NewBoard()
+
+	p := board.Pieces
+	chess_utils.PrintBoard(p)
+	fmt.Println(chess_utils.Moves(chess_utils.GetPieceAt(board, 4, 6)))
+
 	listeners := [5]int{11, 18, 20, 21, 23}
 	towers := [4]int{1, 2, 13, 22}
 	distances := []int{}
