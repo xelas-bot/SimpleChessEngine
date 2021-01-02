@@ -5,22 +5,36 @@ import (
 )
 
 type Piece struct {
-	Name  string
-	Color int8
+	Name   rune
+	Player bool
+	X_Pos  int8
+	Y_Pos  int8
+}
+
+type Move struct {
+	Piece *Piece
 	X_Pos int8
 	Y_Pos int8
-	//Value int
 }
 
-type Point struct {
-	x int8
-	y int8
+func IsEmpty(piece *Piece) bool {
+	return piece.Name == 'E'
+}
+func IsPiece(piece *Piece) bool {
+	return piece.Name != 'E'
 }
 
-func NewPiece(name string, color int8, x_pos int8, y_pos int8) *Piece {
-	p := Piece{Name: name, Color: color, X_Pos: x_pos, Y_Pos: y_pos}
+func IsWhite(piece *Piece) bool {
+	return !piece.Player
+}
+
+func IsBlack(piece *Piece) bool {
+	return piece.Player
+}
+
+func NewPiece(name rune, player bool, x_pos int8, y_pos int8) *Piece {
+	p := Piece{Name: name, Player: player, X_Pos: x_pos, Y_Pos: y_pos}
 	return &p
-
 }
 
 func ReturnChessNot(piece Piece) string {
@@ -30,6 +44,8 @@ func ReturnChessNot(piece Piece) string {
 	return ToReturn
 }
 
+/*
+
 func Moves(piece *Piece) []Point {
 	initial_moves := []Point{}
 	if piece.Color == 0 {
@@ -37,7 +53,7 @@ func Moves(piece *Piece) []Point {
 		return initial_moves
 	}
 
-	if piece.Name == "PAWN" {
+	if piece.Name == 'P' {
 		if piece.Y_Pos != 1 && piece.Y_Pos != 6 && piece.Y_Pos != 0 {
 			if piece.Color == 1 {
 				initial_moves = append(initial_moves, Point{piece.X_Pos, piece.Y_Pos + 1})
@@ -62,3 +78,4 @@ func Moves(piece *Piece) []Point {
 
 	return initial_moves
 }
+*/
