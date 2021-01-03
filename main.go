@@ -1,19 +1,13 @@
 package main
 
-import (
-	"ChessEngine/chess_utils"
-	"ChessEngine/tree_utils"
-	"fmt"
-)
+import "fmt"
 
 func main() {
 
-	fmt.Println(tree_utils.Hello())
-
-	board := chess_utils.NewBoard()
-
-	p := board.Pieces
-	chess_utils.PrintBoard(p)
+	counter := 1
+	for i := counter + 1; i < 8; i++ {
+		fmt.Println(i)
+	}
 
 	/*
 		listeners := [5]int{11, 18, 20, 21, 23}
