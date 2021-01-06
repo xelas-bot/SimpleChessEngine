@@ -18,28 +18,17 @@ func GetBoardMoves(board *Board) []Move {
 	MoveList := []Move{}
 	//black is true
 	// black turn
-	if board.Turn {
-
-	}
 
 	for _, piece := range board.WhitePieces {
 		if piece.Name == 'P' {
-			if IsWhite(piece) {
-				if IsEmpty(GetPieceAt(board, piece.X_Pos, piece.Y_Pos+1)) {
-					// might need to use a pointer to move rather than creating move as value
-					MoveList = append(MoveList, Move{piece, piece.X_Pos, piece.Y_Pos + 1})
-					if IsEmpty(GetPieceAt(board, piece.X_Pos, piece.Y_Pos+2)) {
-						MoveList = append(MoveList, Move{piece, piece.X_Pos, piece.Y_Pos + 2})
-					}
-				}
-			} else {
-				if IsEmpty(GetPieceAt(board, piece.X_Pos, piece.Y_Pos-1)) {
-					MoveList = append(MoveList, Move{piece, piece.X_Pos, piece.Y_Pos - 1})
-					if IsEmpty(GetPieceAt(board, piece.X_Pos, piece.Y_Pos-2)) {
-						MoveList = append(MoveList, Move{piece, piece.X_Pos, piece.Y_Pos - 2})
-					}
+
+			if IsEmpty(GetPieceAt(board, piece.X_Pos, piece.Y_Pos+1)) {
+				MoveList = append(MoveList, Move{piece, piece.X_Pos, piece.Y_Pos + 1})
+				if IsEmpty(GetPieceAt(board, piece.X_Pos, piece.Y_Pos+2)) && piece.Y_Pos == 1 {
+					MoveList = append(MoveList, Move{piece, piece.X_Pos, piece.Y_Pos + 2})
 				}
 			}
+
 		} else if piece.Name == 'N' {
 			for i := 0; i < 8; i++ {
 				if OutOfBounds(piece.X_Pos+KnightMoves[i], piece.Y_Pos+KnightMoves[i+1]) {
@@ -62,67 +51,67 @@ func GetBoardMoves(board *Board) []Move {
 			// Horizontal File
 
 			for i := counter + 1; i < 8; i++ {
-				tile := GetPieceAt(board, counter, piece.Y_Pos)
-				if IsPiece(GetPieceAt(board, counter, piece.Y_Pos)) {
+				tile := GetPieceAt(board, i, piece.Y_Pos)
+				if IsPiece(GetPieceAt(board, i, piece.Y_Pos)) {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, counter, piece.Y_Pos})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, i, piece.Y_Pos})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, counter, piece.Y_Pos})
+						CaptureList = append(CaptureList, Move{piece, i, piece.Y_Pos})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, counter, piece.Y_Pos})
+					MoveList = append(MoveList, Move{piece, i, piece.Y_Pos})
 				}
 			}
 
 			for i := counter - 1; i >= 0; i-- {
-				tile := GetPieceAt(board, counter, piece.Y_Pos)
-				if IsPiece(GetPieceAt(board, counter, piece.Y_Pos)) {
+				tile := GetPieceAt(board, i, piece.Y_Pos)
+				if IsPiece(GetPieceAt(board, i, piece.Y_Pos)) {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, counter, piece.Y_Pos})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, i, piece.Y_Pos})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, counter, piece.Y_Pos})
+						CaptureList = append(CaptureList, Move{piece, i, piece.Y_Pos})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, counter, piece.Y_Pos})
+					MoveList = append(MoveList, Move{piece, i, piece.Y_Pos})
 				}
 			}
 
 			yCounter := piece.Y_Pos
 			// Vertical File
 			for i := yCounter + 1; i < 8; i++ {
-				tile := GetPieceAt(board, piece.X_Pos, yCounter)
-				if IsPiece(GetPieceAt(board, piece.X_Pos, yCounter)) {
+				tile := GetPieceAt(board, piece.X_Pos, i)
+				if IsPiece(GetPieceAt(board, piece.X_Pos, i)) {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, piece.X_Pos, yCounter})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, piece.X_Pos, i})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, piece.X_Pos, yCounter})
+						CaptureList = append(CaptureList, Move{piece, piece.X_Pos, i})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, piece.X_Pos, yCounter})
+					MoveList = append(MoveList, Move{piece, piece.X_Pos, i})
 				}
 			}
 			for i := yCounter - 1; i >= 0; i-- {
-				tile := GetPieceAt(board, piece.X_Pos, yCounter)
-				if IsPiece(GetPieceAt(board, piece.X_Pos, yCounter)) {
+				tile := GetPieceAt(board, piece.X_Pos, i)
+				if IsPiece(GetPieceAt(board, piece.X_Pos, i)) {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, piece.X_Pos, yCounter})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, piece.X_Pos, i})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, piece.X_Pos, yCounter})
+						CaptureList = append(CaptureList, Move{piece, piece.X_Pos, i})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, piece.X_Pos, yCounter})
+					MoveList = append(MoveList, Move{piece, piece.X_Pos, i})
 				}
 			}
 		} else if piece.Name == 'Q' {
@@ -166,43 +155,143 @@ func GetBoardMoves(board *Board) []Move {
 			yCounter := piece.Y_Pos
 			// Vertical File
 			for i := yCounter + 1; i < 8; i++ {
-				tile := GetPieceAt(board, piece.X_Pos, yCounter)
-				if IsPiece(GetPieceAt(board, piece.X_Pos, yCounter)) {
+				tile := GetPieceAt(board, piece.X_Pos, i)
+
+				if IsPiece(GetPieceAt(board, piece.X_Pos, i)) {
+
 					if tile.Name != 'E' && tile.Player == piece.Player {
+
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, piece.X_Pos, yCounter})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, piece.X_Pos, i})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, piece.X_Pos, yCounter})
+						CaptureList = append(CaptureList, Move{piece, piece.X_Pos, i})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, piece.X_Pos, yCounter})
+
+					MoveList = append(MoveList, Move{piece, piece.X_Pos, i})
+					//fmt.Println(MoveList)
 				}
 			}
 			for i := yCounter - 1; i >= 0; i-- {
-				tile := GetPieceAt(board, piece.X_Pos, yCounter)
-				if IsPiece(GetPieceAt(board, piece.X_Pos, yCounter)) {
+				tile := GetPieceAt(board, piece.X_Pos, i)
+				if IsPiece(GetPieceAt(board, piece.X_Pos, i)) {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, piece.X_Pos, yCounter})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, piece.X_Pos, i})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, piece.X_Pos, yCounter})
+						CaptureList = append(CaptureList, Move{piece, piece.X_Pos, i})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, piece.X_Pos, yCounter})
+					MoveList = append(MoveList, Move{piece, piece.X_Pos, i})
 				}
+			}
+
+			//Diagonals
+
+			xCounter := piece.X_Pos + 1
+			yCounter = piece.Y_Pos + 1
+
+			for x, y := xCounter, yCounter; x < 8 && y < 8; x, y = x+1, y+1 {
+				tile := GetPieceAt(board, x, y)
+				if IsPiece(GetPieceAt(board, x, y)) {
+					if tile.Name != 'E' && tile.Player == piece.Player {
+						break
+					} else if GetValue(tile) > GetValue(piece) {
+						BetterCaptureList = append(BetterCaptureList, Move{piece, x, y})
+					} else {
+						CaptureList = append(CaptureList, Move{piece, x, y})
+					}
+					break
+				} else {
+					MoveList = append(MoveList, Move{piece, x, y})
+				}
+
+			}
+
+			xCounter = piece.X_Pos - 1
+			yCounter = piece.Y_Pos - 1
+
+			for x, y := xCounter, yCounter; x >= 0 && y >= 0; x, y = x-1, y-1 {
+				tile := GetPieceAt(board, x, y)
+				if IsPiece(GetPieceAt(board, x, y)) {
+					if tile.Name != 'E' && tile.Player == piece.Player {
+						break
+					} else if GetValue(tile) > GetValue(piece) {
+						BetterCaptureList = append(BetterCaptureList, Move{piece, x, y})
+					} else {
+						CaptureList = append(CaptureList, Move{piece, x, y})
+					}
+					break
+				} else {
+					MoveList = append(MoveList, Move{piece, x, y})
+				}
+
+			}
+
+		} else if piece.Name == 'B' {
+			//Diagonals
+
+			xCounter := piece.X_Pos + 1
+			yCounter := piece.Y_Pos + 1
+
+			for x, y := xCounter, yCounter; x < 8 && y < 8; x, y = x+1, y+1 {
+				tile := GetPieceAt(board, x, y)
+				if IsPiece(GetPieceAt(board, x, y)) {
+					if tile.Name != 'E' && tile.Player == piece.Player {
+						break
+					} else if GetValue(tile) > GetValue(piece) {
+						BetterCaptureList = append(BetterCaptureList, Move{piece, x, y})
+					} else {
+						CaptureList = append(CaptureList, Move{piece, x, y})
+					}
+					break
+				} else {
+					MoveList = append(MoveList, Move{piece, x, y})
+				}
+
+			}
+
+			xCounter = piece.X_Pos - 1
+			yCounter = piece.Y_Pos - 1
+
+			for x, y := xCounter, yCounter; x >= 0 && y >= 0; x, y = x-1, y-1 {
+				tile := GetPieceAt(board, x, y)
+				if IsPiece(GetPieceAt(board, x, y)) {
+					if tile.Name != 'E' && tile.Player == piece.Player {
+						break
+					} else if GetValue(tile) > GetValue(piece) {
+						BetterCaptureList = append(BetterCaptureList, Move{piece, x, y})
+					} else {
+						CaptureList = append(CaptureList, Move{piece, x, y})
+					}
+					break
+				} else {
+					MoveList = append(MoveList, Move{piece, x, y})
+				}
+
+			}
+		} else if piece.Name == 'K' {
+
+			tile := GetPieceAt(board, piece.X_Pos+1, piece.Y_Pos)
+			if IsPiece(tile) && tile.Player != piece.Player {
+				CaptureList = append(CaptureList, Move{piece, piece.X_Pos + 1, piece.Y_Pos})
+			} else if !IsPiece(tile) {
+				MoveList = append(MoveList, Move{piece, piece.X_Pos + 1, piece.Y_Pos})
 			}
 
 		}
 	}
 
-	return nil
+	//BetterCaptureList = append(BetterCaptureList, CaptureList...)
+	//BetterCaptureList = append(BetterCaptureList, MoveList...)
+	return MoveList
 }
 
-func GetValue(piece *Piece) int8 {
+func GetValue(piece *Piece) int32 {
 	switch piece.Name {
 	case 'P':
 		return 100
@@ -229,7 +318,7 @@ func NewBoard() *Board {
 
 	// white pawns
 	for i := 0; i < 8; i++ {
-		board.WhitePieces = append(board.WhitePieces, NewPiece('P', false, int8(i), 1))
+		board.WhitePieces = append(board.WhitePieces, NewPiece('P', false, int8(i), 2))
 	}
 	// white king
 	board.WhitePieces = append(board.WhitePieces, NewPiece('K', false, 4, 0))

@@ -1,13 +1,25 @@
 package main
 
-import "fmt"
+import (
+	"ChessEngine/chess_utils"
+	"fmt"
+)
 
 func main() {
+	board := chess_utils.NewBoard()
 
-	counter := 1
-	for i := counter + 1; i < 8; i++ {
-		fmt.Println(i)
+	moveList := chess_utils.GetBoardMoves(board)
+
+	fmt.Println(len(moveList))
+
+	for index := range moveList {
+		fmt.Print(string(moveList[index].Piece.Name))
+		fmt.Print(moveList[index].X_Pos)
+		fmt.Print(", ")
+		fmt.Print(moveList[index].Y_Pos)
+		fmt.Println()
 	}
+	chess_utils.PrintBoard(board.WhitePieces)
 
 	/*
 		listeners := [5]int{11, 18, 20, 21, 23}
