@@ -21,7 +21,6 @@ func IsEmpty(piece *Piece) bool {
 	return piece.Name == 'E'
 }
 func IsPiece(piece *Piece) bool {
-
 	return piece.Name != 'E'
 }
 
