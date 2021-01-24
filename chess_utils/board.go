@@ -450,9 +450,9 @@ func GetBoardMoves(board *Board) []Move {
 		}
 	}
 
-	//BetterCaptureList = append(BetterCaptureList, CaptureList...)
-	//BetterCaptureList = append(BetterCaptureList, MoveList...)
-	return MoveList
+	BetterCaptureList = append(BetterCaptureList, CaptureList...)
+	BetterCaptureList = append(BetterCaptureList, MoveList...)
+	return BetterCaptureList
 }
 
 func IsEndgame(board *Board) bool {
