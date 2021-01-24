@@ -117,6 +117,35 @@ func ExecuteMove(move Move, board *Board) {
 	board.Turn = !board.Turn
 }
 
+func UndoMove(move Move, board *Board) {
+	tempPiece := GetPieceAt(board, move.X_Pos, move.Y_Pos)
+	index_ := 0
+
+	pieceSet := board.BlackPieces
+	if board.Turn {
+		pieceSet = board.WhitePieces
+	}
+
+	if IsPiece(tempPiece) {
+		for index, piece := range pieceSet {
+			if piece.X_Pos == move.CapPiece.X_Pos && piece.Y_Pos == move.CapPiece.Y_Pos {
+				index_ = index
+			}
+		}
+
+		move.Piece.X_Pos = move.X_Pos
+		move.Piece.Y_Pos = move.Y_Pos
+
+		pieceSet[index_] = pieceSet[len(pieceSet)-1] // Copy last element to index i.
+		pieceSet = pieceSet[:len(pieceSet)-1]        // Truncate slice.
+	} else {
+		move.Piece.X_Pos = move.X_Pos
+		move.Piece.Y_Pos = move.Y_Pos
+	}
+
+	board.Turn = !board.Turn
+}
+
 func GetBoardMoves(board *Board) []Move {
 	BetterCaptureList := []Move{}
 	CaptureList := []Move{}
@@ -135,9 +164,9 @@ func GetBoardMoves(board *Board) []Move {
 
 			if IsEmpty(GetPieceAt(board, piece.X_Pos, piece.Y_Pos+1)) {
 
-				MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos + 1})
+				MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, piece.Y_Pos + 1})
 				if IsEmpty(GetPieceAt(board, piece.X_Pos, piece.Y_Pos+2)) && piece.Y_Pos == 1 {
-					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos + 2})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, piece.Y_Pos + 2})
 				}
 			}
 
@@ -149,11 +178,11 @@ func GetBoardMoves(board *Board) []Move {
 				}
 				tile := GetPieceAt(board, piece.X_Pos+KnightMoves[i], piece.Y_Pos+KnightMoves[i+1])
 				if IsEmpty(tile) {
-					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos + KnightMoves[i], piece.Y_Pos + KnightMoves[i+1]})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos + KnightMoves[i], piece.Y_Pos + KnightMoves[i+1]})
 				} else if GetValue(tile) > GetValue(piece) {
-					BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos + KnightMoves[i], piece.Y_Pos + KnightMoves[i+1]})
+					BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos + KnightMoves[i], piece.Y_Pos + KnightMoves[i+1]})
 				} else {
-					CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos + KnightMoves[i], piece.Y_Pos + KnightMoves[i+1]})
+					CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos + KnightMoves[i], piece.Y_Pos + KnightMoves[i+1]})
 				}
 			}
 		} else if piece.Name == 'R' {
@@ -171,13 +200,13 @@ func GetBoardMoves(board *Board) []Move {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, i, piece.Y_Pos})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, i, piece.Y_Pos})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, pieceToCap, i, piece.Y_Pos})
+						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, i, piece.Y_Pos})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, pieceToCap, i, piece.Y_Pos})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, i, piece.Y_Pos})
 				}
 			}
 
@@ -188,13 +217,13 @@ func GetBoardMoves(board *Board) []Move {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, i, piece.Y_Pos})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, i, piece.Y_Pos})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, pieceToCap, i, piece.Y_Pos})
+						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, i, piece.Y_Pos})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, pieceToCap, i, piece.Y_Pos})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, i, piece.Y_Pos})
 				}
 			}
 
@@ -207,13 +236,13 @@ func GetBoardMoves(board *Board) []Move {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, i})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, i})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, i})
+						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, i})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, i})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, i})
 				}
 			}
 			for i := yCounter - 1; i >= 0; i-- {
@@ -223,13 +252,13 @@ func GetBoardMoves(board *Board) []Move {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, i})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, i})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, i})
+						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, i})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, i})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, i})
 				}
 			}
 		} else if piece.Name == 'Q' {
@@ -245,13 +274,13 @@ func GetBoardMoves(board *Board) []Move {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, i, piece.Y_Pos})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, i, piece.Y_Pos})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, pieceToCap, i, piece.Y_Pos})
+						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, i, piece.Y_Pos})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, pieceToCap, i, piece.Y_Pos})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, i, piece.Y_Pos})
 				}
 			}
 
@@ -262,13 +291,13 @@ func GetBoardMoves(board *Board) []Move {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, i, piece.Y_Pos})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, i, piece.Y_Pos})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, pieceToCap, i, piece.Y_Pos})
+						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, i, piece.Y_Pos})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, pieceToCap, i, piece.Y_Pos})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, i, piece.Y_Pos})
 				}
 			}
 
@@ -284,14 +313,14 @@ func GetBoardMoves(board *Board) []Move {
 
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, i})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, i})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, i})
+						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, i})
 					}
 					break
 				} else {
 
-					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, i})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, i})
 					//fmt.Println(MoveList)
 				}
 			}
@@ -302,13 +331,13 @@ func GetBoardMoves(board *Board) []Move {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, i})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, i})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, i})
+						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, i})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, i})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, i})
 				}
 			}
 
@@ -324,13 +353,13 @@ func GetBoardMoves(board *Board) []Move {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, x, y})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, pieceToCap, x, y})
+						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, pieceToCap, x, y})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 				}
 
 			}
@@ -346,14 +375,14 @@ func GetBoardMoves(board *Board) []Move {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, x, y})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, pieceToCap, x, y})
+						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 					}
 					break
 				} else {
 
-					MoveList = append(MoveList, Move{piece, pieceToCap, x, y})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 				}
 
 			}
@@ -368,13 +397,13 @@ func GetBoardMoves(board *Board) []Move {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, x, y})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, pieceToCap, x, y})
+						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, pieceToCap, x, y})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 				}
 
 			}
@@ -390,14 +419,14 @@ func GetBoardMoves(board *Board) []Move {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, x, y})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, pieceToCap, x, y})
+						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 					}
 					break
 				} else {
 
-					MoveList = append(MoveList, Move{piece, pieceToCap, x, y})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 				}
 
 			}
@@ -415,13 +444,13 @@ func GetBoardMoves(board *Board) []Move {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, x, y})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, pieceToCap, x, y})
+						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, pieceToCap, x, y})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 				}
 
 			}
@@ -437,14 +466,14 @@ func GetBoardMoves(board *Board) []Move {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, x, y})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, pieceToCap, x, y})
+						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 					}
 					break
 				} else {
 
-					MoveList = append(MoveList, Move{piece, pieceToCap, x, y})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 				}
 
 			}
@@ -459,13 +488,13 @@ func GetBoardMoves(board *Board) []Move {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, x, y})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, pieceToCap, x, y})
+						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 					}
 					break
 				} else {
-					MoveList = append(MoveList, Move{piece, pieceToCap, x, y})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 				}
 
 			}
@@ -481,14 +510,14 @@ func GetBoardMoves(board *Board) []Move {
 					if tile.Name != 'E' && tile.Player == piece.Player {
 						break
 					} else if GetValue(tile) > GetValue(piece) {
-						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, x, y})
+						BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 					} else {
-						CaptureList = append(CaptureList, Move{piece, pieceToCap, x, y})
+						CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 					}
 					break
 				} else {
 
-					MoveList = append(MoveList, Move{piece, pieceToCap, x, y})
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, x, y})
 				}
 
 			}
@@ -497,9 +526,9 @@ func GetBoardMoves(board *Board) []Move {
 
 			tile := GetPieceAt(board, piece.X_Pos+1, piece.Y_Pos)
 			if IsPiece(tile) && tile.Player != piece.Player {
-				CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos + 1, piece.Y_Pos})
+				CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos + 1, piece.Y_Pos})
 			} else if !IsPiece(tile) {
-				MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos + 1, piece.Y_Pos})
+				MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos + 1, piece.Y_Pos})
 			}
 
 		}

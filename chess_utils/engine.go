@@ -8,7 +8,9 @@ func Engine(board *Board, depth int) Move {
 	bestValue := int(math.Inf(-1))
 	bestMove := 0
 	for i, move := range MoveList {
+		ExecuteMove(move, board)
 		value := negamax(board, depth, int(math.Inf(-1)), int(math.Inf(1)), board.Turn)
+		UndoMove(move, board)
 		if value > bestValue {
 			bestValue = value
 			bestMove = i
@@ -30,8 +32,9 @@ func negamax(board *Board, depth int, a int, b int, player bool) int {
 
 	value := int(math.Inf(-1))
 	for _, move := range MoveList {
-
+		ExecuteMove(move, board)
 		eval := negamax(board, depth-1, -b, -a, !player)
+		UndoMove(move, board)
 		if eval > value {
 			value = eval
 		}
