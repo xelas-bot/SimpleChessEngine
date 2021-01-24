@@ -13,11 +13,17 @@ func main() {
 	fmt.Println(len(moveList))
 
 	for index := range moveList {
-		fmt.Print(string(moveList[index].Piece.Name))
-		fmt.Print(moveList[index].X_Pos)
-		fmt.Print(", ")
-		fmt.Print(moveList[index].Y_Pos)
-		fmt.Println()
+		if moveList[index].Piece.Name == 'Q' {
+			fmt.Print(moveList[index].Piece.X_Pos)
+			fmt.Print(", ")
+			fmt.Print(moveList[index].Piece.Y_Pos)
+			fmt.Print(string(moveList[index].Piece.Name))
+			fmt.Print(moveList[index].X_Pos)
+			fmt.Print(", ")
+			fmt.Print(moveList[index].Y_Pos)
+			fmt.Println()
+		}
+
 	}
 	chess_utils.PrintBoard(board.WhitePieces)
 

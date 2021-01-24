@@ -4,7 +4,7 @@
     <list default="true" id="df51a2fb-5bf4-4b73-9db9-098447d84fc9" name="Default Changelist" comment="Add starting board/piece data">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/chess_utils/board.go" beforeDir="false" afterPath="$PROJECT_DIR$/chess_utils/board.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chess_utils/piece.go" beforeDir="false" afterPath="$PROJECT_DIR$/chess_utils/piece.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -132,7 +132,8 @@
     <MESSAGE value="Add initial utils" />
     <MESSAGE value="Add starting board/piece data" />
     <MESSAGE value="Add dynamic board and possible moves" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add dynamic board and possible moves" />
+    <MESSAGE value="Fix Board" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix Board" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
