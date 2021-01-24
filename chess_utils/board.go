@@ -92,13 +92,13 @@ func ExecuteMove(move Move, board *Board) {
 	tempPiece := GetPieceAt(board, move.X_Pos, move.Y_Pos)
 	index_ := 0
 
-	pieceSet := board.BlackPieces
+	pieceSet := &board.BlackPieces
 	if board.Turn {
-		pieceSet = board.WhitePieces
+		pieceSet = &board.WhitePieces
 	}
 
 	if IsPiece(tempPiece) {
-		for index, piece := range pieceSet {
+		for index, piece := range *pieceSet {
 			if piece.X_Pos == move.CapPiece.X_Pos && piece.Y_Pos == move.CapPiece.Y_Pos {
 				index_ = index
 			}
@@ -106,15 +106,18 @@ func ExecuteMove(move Move, board *Board) {
 
 		move.Piece.X_Pos = move.X_Pos
 		move.Piece.Y_Pos = move.Y_Pos
+		//fmt.Print(len(pieceSet))
+		(*pieceSet)[index_] = (*pieceSet)[len(*pieceSet)-1] // Copy last element to index i.
+		*pieceSet = (*pieceSet)[:len(*pieceSet)-1]          // Truncate slice.
 
-		pieceSet[index_] = pieceSet[len(pieceSet)-1] // Copy last element to index i.
-		pieceSet = pieceSet[:len(pieceSet)-1]        // Truncate slice.
 	} else {
 		move.Piece.X_Pos = move.X_Pos
 		move.Piece.Y_Pos = move.Y_Pos
 	}
 
+	//fmt.Print(len(pieceSet))
 	board.Turn = !board.Turn
+
 }
 
 func GetBoardMoves(board *Board) []Move {
