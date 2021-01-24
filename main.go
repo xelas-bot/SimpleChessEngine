@@ -20,8 +20,6 @@ func main() {
 
 	moveList := chess_utils.GetBoardMoves(board)
 
-	fmt.Println(len(board.BlackPieces))
-
 	for index := range moveList {
 		if moveList[index].Piece.Name == 'Q' {
 			fmt.Print(moveList[index].Piece.X_Pos)
@@ -37,6 +35,7 @@ func main() {
 	}
 
 	chess_utils.PrintBoard(board)
+	fmt.Println(len(board.BlackPieces))
 
 	/*
 		listeners := [5]int{11, 18, 20, 21, 23}
