@@ -6,32 +6,68 @@ import (
 
 var KnightMoves = [16]int8{1, 2, 2, 1, 2, -1, 1, -2, -1, -2, -2, -1, -2, 1, -1, 2}
 
-var PawnTable = [64]int8 { 	0,  0,  0,  0,  0,  0,  0,  0,
-							50, 50, 50, 50, 50, 50, 50, 50,
-							10, 10, 20, 30, 30, 20, 10, 10,
-							5,  5, 10, 25, 25, 10,  5,  5,
-							0,  0,  0, 20, 20,  0,  0,  0,
-							5, -5,-10,  0,  0,-10, -5,  5,
-							5, 10, 10,-20,-20, 10, 10,  5,
-							0,  0,  0,  0,  0,  0,  0,  0	}
+var PawnTable = [64]int{0, 0, 0, 0, 0, 0, 0, 0,
+	50, 50, 50, 50, 50, 50, 50, 50,
+	10, 10, 20, 30, 30, 20, 10, 10,
+	5, 5, 10, 25, 25, 10, 5, 5,
+	0, 0, 0, 20, 20, 0, 0, 0,
+	5, -5, -10, 0, 0, -10, -5, 5,
+	5, 10, 10, -20, -20, 10, 10, 5,
+	0, 0, 0, 0, 0, 0, 0, 0}
 
-var KnightTable = [64]int8 {-50,-40,-30,-30,-30,-30,-40,-50,
-							-40,-20,  0,  0,  0,  0,-20,-40,
-							-30,  0, 10, 15, 15, 10,  0,-30,
-							-30,  5, 15, 20, 20, 15,  5,-30,
-							-30,  0, 15, 20, 20, 15,  0,-30,
-							-30,  5, 10, 15, 15, 10,  5,-30,
-							-40,-20,  0,  5,  5,  0,-20,-40,
-							-50,-40,-30,-30,-30,-30,-40,-50	}
+var KnightTable = [64]int{-50, -40, -30, -30, -30, -30, -40, -50,
+	-40, -20, 0, 0, 0, 0, -20, -40,
+	-30, 0, 10, 15, 15, 10, 0, -30,
+	-30, 5, 15, 20, 20, 15, 5, -30,
+	-30, 0, 15, 20, 20, 15, 0, -30,
+	-30, 5, 10, 15, 15, 10, 5, -30,
+	-40, -20, 0, 5, 5, 0, -20, -40,
+	-50, -40, -30, -30, -30, -30, -40, -50}
 
-var BishopTable = [64]int8 {-20,-10,-10,-10,-10,-10,-10,-20,
-							-10,  0,  0,  0,  0,  0,  0,-10,
-							-10,  0,  5, 10, 10,  5,  0,-10,
-							-10,  5,  5, 10, 10,  5,  5,-10,
-							-10,  0, 10, 10, 10, 10,  0,-10,
-							-10, 10, 10, 10, 10, 10, 10,-10,
-							-10,  5,  0,  0,  0,  0,  5,-10,
-							-20,-10,-10,-10,-10,-10,-10,-20	}
+var BishopTable = [64]int{-20, -10, -10, -10, -10, -10, -10, -20,
+	-10, 0, 0, 0, 0, 0, 0, -10,
+	-10, 0, 5, 10, 10, 5, 0, -10,
+	-10, 5, 5, 10, 10, 5, 5, -10,
+	-10, 0, 10, 10, 10, 10, 0, -10,
+	-10, 10, 10, 10, 10, 10, 10, -10,
+	-10, 5, 0, 0, 0, 0, 5, -10,
+	-20, -10, -10, -10, -10, -10, -10, -20}
+
+var RookTable = [64]int{0, 0, 0, 0, 0, 0, 0, 0,
+	5, 10, 10, 10, 10, 10, 10, 5,
+	-5, 0, 0, 0, 0, 0, 0, -5,
+	-5, 0, 0, 0, 0, 0, 0, -5,
+	-5, 0, 0, 0, 0, 0, 0, -5,
+	-5, 0, 0, 0, 0, 0, 0, -5,
+	-5, 0, 0, 0, 0, 0, 0, -5,
+	0, 0, 0, 5, 5, 0, 0, 0}
+
+var QueenTable = [64]int{-20, -10, -10, -5, -5, -10, -10, -20,
+	-10, 0, 0, 0, 0, 0, 0, -10,
+	-10, 0, 5, 5, 5, 5, 0, -10,
+	-5, 0, 5, 5, 5, 5, 0, -5,
+	0, 0, 5, 5, 5, 5, 0, -5,
+	-10, 5, 5, 5, 5, 5, 0, -10,
+	-10, 0, 5, 0, 0, 0, 0, -10,
+	-20, -10, -10, -5, -5, -10, -10, -20}
+
+var KingTable = [64]int{-30, -40, -40, -50, -50, -40, -40, -30,
+	-30, -40, -40, -50, -50, -40, -40, -30,
+	-30, -40, -40, -50, -50, -40, -40, -30,
+	-30, -40, -40, -50, -50, -40, -40, -30,
+	-20, -30, -30, -40, -40, -30, -30, -20,
+	-10, -20, -20, -20, -20, -20, -20, -10,
+	20, 20, 0, 0, 0, 0, 20, 20,
+	20, 30, 10, 0, 0, 10, 30, 20}
+
+var KingEndTable = [64]int{-50, -40, -30, -20, -20, -30, -40, -50,
+	-30, -20, -10, 0, 0, -10, -20, -30,
+	-30, -10, 20, 30, 30, 20, -10, -30,
+	-30, -10, 30, 40, 40, 30, -10, -30,
+	-30, -10, 30, 40, 40, 30, -10, -30,
+	-30, -10, 20, 30, 30, 20, -10, -30,
+	-30, -30, 0, 0, 0, 0, -30, -30,
+	-50, -30, -30, -30, -30, -30, -30, -50}
 
 type Board struct {
 	WhitePieces []*Piece
@@ -40,17 +76,16 @@ type Board struct {
 }
 
 func Evaluate(board *Board) int {
-	white_score := 0
-	black_score := 0
+	Score := 0
 
+	EndGame := IsEndgame(board)
 	for _, piece := range board.WhitePieces {
-		white_score += GetValue(piece)
+		Score += GetValue(piece) + GetPieceTableValue(piece, EndGame)
 	}
 	for _, piece := range board.BlackPieces {
-		black_score += GetValue(piece)
+		Score -= GetValue(piece) + GetPieceTableValue(piece, EndGame)
 	}
-
-
+	return Score
 }
 
 func GetBoardMoves(board *Board) []Move {
@@ -374,6 +409,56 @@ func GetBoardMoves(board *Board) []Move {
 	//BetterCaptureList = append(BetterCaptureList, CaptureList...)
 	//BetterCaptureList = append(BetterCaptureList, MoveList...)
 	return MoveList
+}
+
+func IsEndgame(board *Board) bool {
+	WhiteQueen := false
+	WhiteMinor := false
+	for _, piece := range board.WhitePieces {
+		if piece.Name == 'Q' {
+			WhiteQueen = true
+		} else if piece.Name != 'P' || piece.Name != 'K' {
+			WhiteMinor = true
+		}
+	}
+	BlackQueen := false
+	BlackMinor := false
+	for _, piece := range board.BlackPieces {
+		if piece.Name == 'Q' {
+			BlackQueen = true
+		} else if piece.Name != 'P' || piece.Name != 'K' {
+			BlackMinor = true
+		}
+	}
+	return !WhiteQueen && !BlackQueen || !WhiteMinor && !BlackMinor
+}
+
+func GetPieceTableValue(piece *Piece, EndGame bool) int {
+	var pos int8
+	if IsWhite(piece) {
+		pos = 64 - 8*piece.Y_Pos + piece.X_Pos
+	} else {
+		pos = 8*piece.Y_Pos + piece.X_Pos
+	}
+	switch piece.Name {
+	case 'P':
+		return PawnTable[pos]
+	case 'N':
+		return KnightTable[pos]
+	case 'B':
+		return BishopTable[pos]
+	case 'R':
+		return RookTable[pos]
+	case 'Q':
+		return QueenTable[pos]
+	case 'K':
+		if EndGame {
+			return KingEndTable[pos]
+		} else {
+			return KingTable[pos]
+		}
+	}
+	return 0
 }
 
 func GetValue(piece *Piece) int {

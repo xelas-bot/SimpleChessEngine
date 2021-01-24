@@ -5,10 +5,11 @@ import (
 )
 
 type Piece struct {
-	Name   rune
-	Player bool
-	X_Pos  int8
-	Y_Pos  int8
+	Name     rune
+	Player   bool
+	X_Pos    int8
+	Y_Pos    int8
+	HasMoved bool
 }
 
 type Move struct {
@@ -33,7 +34,7 @@ func IsBlack(piece *Piece) bool {
 }
 
 func NewPiece(name rune, player bool, x_pos int8, y_pos int8) *Piece {
-	p := Piece{Name: name, Player: player, X_Pos: x_pos, Y_Pos: y_pos}
+	p := Piece{Name: name, Player: player, X_Pos: x_pos, Y_Pos: y_pos, HasMoved: false}
 	return &p
 }
 
