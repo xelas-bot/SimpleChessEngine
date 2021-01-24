@@ -7,10 +7,20 @@ import (
 
 func main() {
 	board := chess_utils.NewBoard()
+	board.Turn = false
+	chess_utils.PrintBoard(board)
+
+	move := chess_utils.Move{
+		Piece:    chess_utils.GetPieceAt(board, 3, 5),
+		CapPiece: chess_utils.GetPieceAt(board, 4, 6),
+		X_Pos:    4,
+		Y_Pos:    6,
+	}
+	chess_utils.ExecuteMove(move, board)
 
 	moveList := chess_utils.GetBoardMoves(board)
 
-	fmt.Println(len(moveList))
+	fmt.Println(len(board.BlackPieces))
 
 	for index := range moveList {
 		if moveList[index].Piece.Name == 'Q' {
@@ -25,7 +35,8 @@ func main() {
 		}
 
 	}
-	chess_utils.PrintBoard(board.WhitePieces)
+
+	chess_utils.PrintBoard(board)
 
 	/*
 		listeners := [5]int{11, 18, 20, 21, 23}

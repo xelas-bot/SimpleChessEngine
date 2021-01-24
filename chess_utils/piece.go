@@ -13,9 +13,10 @@ type Piece struct {
 }
 
 type Move struct {
-	Piece *Piece
-	X_Pos int8
-	Y_Pos int8
+	Piece    *Piece
+	CapPiece *Piece
+	X_Pos    int8
+	Y_Pos    int8
 }
 
 func IsEmpty(piece *Piece) bool {
