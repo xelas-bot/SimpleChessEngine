@@ -6,10 +6,51 @@ import (
 
 var KnightMoves = [16]int8{1, 2, 2, 1, 2, -1, 1, -2, -1, -2, -2, -1, -2, 1, -1, 2}
 
+var PawnTable = [64]int8 { 	0,  0,  0,  0,  0,  0,  0,  0,
+							50, 50, 50, 50, 50, 50, 50, 50,
+							10, 10, 20, 30, 30, 20, 10, 10,
+							5,  5, 10, 25, 25, 10,  5,  5,
+							0,  0,  0, 20, 20,  0,  0,  0,
+							5, -5,-10,  0,  0,-10, -5,  5,
+							5, 10, 10,-20,-20, 10, 10,  5,
+							0,  0,  0,  0,  0,  0,  0,  0	}
+
+var KnightTable = [64]int8 {-50,-40,-30,-30,-30,-30,-40,-50,
+							-40,-20,  0,  0,  0,  0,-20,-40,
+							-30,  0, 10, 15, 15, 10,  0,-30,
+							-30,  5, 15, 20, 20, 15,  5,-30,
+							-30,  0, 15, 20, 20, 15,  0,-30,
+							-30,  5, 10, 15, 15, 10,  5,-30,
+							-40,-20,  0,  5,  5,  0,-20,-40,
+							-50,-40,-30,-30,-30,-30,-40,-50	}
+
+var BishopTable = [64]int8 {-20,-10,-10,-10,-10,-10,-10,-20,
+							-10,  0,  0,  0,  0,  0,  0,-10,
+							-10,  0,  5, 10, 10,  5,  0,-10,
+							-10,  5,  5, 10, 10,  5,  5,-10,
+							-10,  0, 10, 10, 10, 10,  0,-10,
+							-10, 10, 10, 10, 10, 10, 10,-10,
+							-10,  5,  0,  0,  0,  0,  5,-10,
+							-20,-10,-10,-10,-10,-10,-10,-20	}
+
 type Board struct {
 	WhitePieces []*Piece
 	BlackPieces []*Piece
 	Turn        bool
+}
+
+func Evaluate(board *Board) int {
+	white_score := 0
+	black_score := 0
+
+	for _, piece := range board.WhitePieces {
+		white_score += GetValue(piece)
+	}
+	for _, piece := range board.BlackPieces {
+		black_score += GetValue(piece)
+	}
+
+
 }
 
 func GetBoardMoves(board *Board) []Move {
@@ -335,7 +376,7 @@ func GetBoardMoves(board *Board) []Move {
 	return MoveList
 }
 
-func GetValue(piece *Piece) int32 {
+func GetValue(piece *Piece) int {
 	switch piece.Name {
 	case 'P':
 		return 100
@@ -370,7 +411,7 @@ func NewBoard() *Board {
 	board.WhitePieces = append(board.WhitePieces, NewPiece('Q', false, 3, 5))
 	// white rook
 	board.WhitePieces = append(board.WhitePieces, NewPiece('R', false, 0, 0))
-	board.WhitePieces = append(board.WhitePieces, NewPiece('R', false, 7, 0))
+	board.WhitePieces = append(board.WhitePieces, NewPiece('R', false, 7, 5))
 	// white knights
 	board.WhitePieces = append(board.WhitePieces, NewPiece('N', false, 1, 0))
 	board.WhitePieces = append(board.WhitePieces, NewPiece('N', false, 6, 0))
