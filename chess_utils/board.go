@@ -2,6 +2,7 @@ package chess_utils
 
 import (
 	"fmt"
+	"strconv"
 )
 
 var KnightMoves = [16]int8{1, 2, 2, 1, 2, -1, 1, -2, -1, -2, -2, -1, -2, 1, -1, 2}
@@ -80,71 +81,63 @@ func Evaluate(board *Board) int {
 
 	EndGame := IsEndgame(board)
 	for _, piece := range board.WhitePieces {
-		Score += GetValue(piece) + GetPieceTableValue(piece, EndGame)
+		Score += GetValue(piece)
+		Score += GetPieceTableValue(piece, EndGame)
 	}
 	for _, piece := range board.BlackPieces {
-		Score -= GetValue(piece) + GetPieceTableValue(piece, EndGame)
+		Score -= GetValue(piece)
+		Score -= GetPieceTableValue(piece, EndGame)
 	}
 	return Score
 }
 
-func ExecuteMove(move Move, board *Board) {
-	tempPiece := GetPieceAt(board, move.X_Pos, move.Y_Pos)
+func ExecuteMove(board *Board, move Move) {
 	index_ := 0
 
-	pieceSet := &board.BlackPieces
-	if board.Turn {
-		pieceSet = &board.WhitePieces
-	}
-
-	if IsPiece(tempPiece) {
-		for index, piece := range *pieceSet {
-			if piece.X_Pos == move.CapPiece.X_Pos && piece.Y_Pos == move.CapPiece.Y_Pos {
-				index_ = index
+	if IsPiece(move.CapPiece) {
+		if board.Turn {
+			for index, piece := range board.WhitePieces {
+				if piece.X_Pos == move.CapPiece.X_Pos && piece.Y_Pos == move.CapPiece.Y_Pos {
+					index_ = index
+				}
 			}
+
+			board.WhitePieces[index_] = board.WhitePieces[len(board.WhitePieces)-1] // Copy last element to index i.
+			board.WhitePieces = board.WhitePieces[:len(board.WhitePieces)-1]        // Truncate slice.
+		} else {
+			for index, piece := range board.BlackPieces {
+				if piece.X_Pos == move.CapPiece.X_Pos && piece.Y_Pos == move.CapPiece.Y_Pos {
+					index_ = index
+				}
+			}
+			//fmt.Print(len(pieceSet))
+			board.BlackPieces[index_] = board.BlackPieces[len(board.BlackPieces)-1] // Copy last element to index i.
+			board.BlackPieces = board.BlackPieces[:len(board.BlackPieces)-1]        // Truncate slice.
+
 		}
-
-		move.Piece.X_Pos = move.X_Pos
-		move.Piece.Y_Pos = move.Y_Pos
-		//fmt.Print(len(pieceSet))
-		(*pieceSet)[index_] = (*pieceSet)[len(*pieceSet)-1] // Copy last element to index i.
-		*pieceSet = (*pieceSet)[:len(*pieceSet)-1]          // Truncate slice.
-
-	} else {
-		move.Piece.X_Pos = move.X_Pos
-		move.Piece.Y_Pos = move.Y_Pos
 	}
+	move.Piece.X_Pos = move.X_Pos
+	move.Piece.Y_Pos = move.Y_Pos
 
-	//fmt.Print(len(pieceSet))
 	board.Turn = !board.Turn
-
 }
 
-func UndoMove(move Move, board *Board) {
-	tempPiece := GetPieceAt(board, move.X_Pos, move.Y_Pos)
-	index_ := 0
+func TextToMove(board *Board, x1 int8, y1 int8, x2 int8, y2 int8) Move {
+	return Move{GetPieceAt(board, x1, y1), GetPieceAt(board, x2, y2), x1, y1, x2, y2}
+}
 
-	pieceSet := board.BlackPieces
-	if board.Turn {
-		pieceSet = board.WhitePieces
-	}
-
-	if IsPiece(tempPiece) {
-		for index, piece := range pieceSet {
-			if piece.X_Pos == move.CapPiece.X_Pos && piece.Y_Pos == move.CapPiece.Y_Pos {
-				index_ = index
-			}
+func UndoMove(board *Board, move Move) {
+	if IsPiece(move.CapPiece) {
+		if board.Turn {
+			board.BlackPieces = append(board.BlackPieces, move.CapPiece)
+		} else {
+			board.WhitePieces = append(board.WhitePieces, move.CapPiece)
 		}
-
-		move.Piece.X_Pos = move.X_Pos
-		move.Piece.Y_Pos = move.Y_Pos
-
-		pieceSet[index_] = pieceSet[len(pieceSet)-1] // Copy last element to index i.
-		pieceSet = pieceSet[:len(pieceSet)-1]        // Truncate slice.
-	} else {
-		move.Piece.X_Pos = move.X_Pos
-		move.Piece.Y_Pos = move.Y_Pos
+		move.CapPiece.X_Pos = move.X_Pos
+		move.CapPiece.Y_Pos = move.Y_Pos
 	}
+	move.Piece.X_Pos = move.Orig_X_Pos
+	move.Piece.Y_Pos = move.Orig_Y_Pos
 
 	board.Turn = !board.Turn
 }
@@ -164,28 +157,41 @@ func GetBoardMoves(board *Board) []Move {
 	for _, piece := range boardToUse {
 		if piece.Name == 'P' {
 			pieceToCap := NewPiece('E', false, -1, -1)
-
-			if IsEmpty(GetPieceAt(board, piece.X_Pos, piece.Y_Pos+1)) {
-
-				MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, piece.Y_Pos + 1})
-				if IsEmpty(GetPieceAt(board, piece.X_Pos, piece.Y_Pos+2)) && piece.Y_Pos == 1 {
-					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, piece.Y_Pos + 2})
-				}
-			}
-
-		} else if piece.Name == 'N' {
-			for i := 0; i < 8; i++ {
-				pieceToCap := GetPieceAt(board, int8(i), piece.Y_Pos)
-				if OutOfBounds(piece.X_Pos+KnightMoves[i], piece.Y_Pos+KnightMoves[i+1]) {
+			if IsBlack(piece) {
+				if piece.Y_Pos == 1 {
 					continue
 				}
-				tile := GetPieceAt(board, piece.X_Pos+KnightMoves[i], piece.Y_Pos+KnightMoves[i+1])
+				if IsEmpty(GetPieceAt(board, piece.X_Pos, piece.Y_Pos-1)) {
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, piece.Y_Pos - 1})
+					if IsEmpty(GetPieceAt(board, piece.X_Pos, piece.Y_Pos-2)) && piece.Y_Pos == 6 {
+						MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, piece.Y_Pos - 2})
+					}
+				}
+			} else {
+				if piece.Y_Pos == 6 {
+					continue
+				}
+				if IsEmpty(GetPieceAt(board, piece.X_Pos, piece.Y_Pos+1)) {
+					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, piece.Y_Pos + 1})
+					if IsEmpty(GetPieceAt(board, piece.X_Pos, piece.Y_Pos+2)) && piece.Y_Pos == 1 {
+						MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos, piece.Y_Pos + 2})
+					}
+				}
+			}
+		} else if piece.Name == 'N' {
+			for i := 0; i < 8; i++ {
+				if OutOfBounds(piece.X_Pos+KnightMoves[2*i], piece.Y_Pos+KnightMoves[2*i+1]) {
+					continue
+				}
+				tile := GetPieceAt(board, piece.X_Pos+KnightMoves[2*i], piece.Y_Pos+KnightMoves[2*i+1])
 				if IsEmpty(tile) {
-					MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos + KnightMoves[i], piece.Y_Pos + KnightMoves[i+1]})
+					MoveList = append(MoveList, Move{piece, tile, piece.X_Pos, piece.Y_Pos, piece.X_Pos + KnightMoves[2*i], piece.Y_Pos + KnightMoves[2*i+1]})
+				} else if tile.Player == piece.Player {
+
 				} else if GetValue(tile) > GetValue(piece) {
-					BetterCaptureList = append(BetterCaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos + KnightMoves[i], piece.Y_Pos + KnightMoves[i+1]})
+					BetterCaptureList = append(BetterCaptureList, Move{piece, tile, piece.X_Pos, piece.Y_Pos, piece.X_Pos + KnightMoves[2*i], piece.Y_Pos + KnightMoves[2*i+1]})
 				} else {
-					CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos + KnightMoves[i], piece.Y_Pos + KnightMoves[i+1]})
+					CaptureList = append(CaptureList, Move{piece, tile, piece.X_Pos, piece.Y_Pos, piece.X_Pos + KnightMoves[2*i], piece.Y_Pos + KnightMoves[2*i+1]})
 				}
 			}
 		} else if piece.Name == 'R' {
@@ -524,16 +530,6 @@ func GetBoardMoves(board *Board) []Move {
 				}
 
 			}
-		} else if piece.Name == 'K' {
-			pieceToCap := GetPieceAt(board, piece.X_Pos+1, piece.Y_Pos)
-
-			tile := GetPieceAt(board, piece.X_Pos+1, piece.Y_Pos)
-			if IsPiece(tile) && tile.Player != piece.Player {
-				CaptureList = append(CaptureList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos + 1, piece.Y_Pos})
-			} else if !IsPiece(tile) {
-				MoveList = append(MoveList, Move{piece, pieceToCap, piece.X_Pos, piece.Y_Pos, piece.X_Pos + 1, piece.Y_Pos})
-			}
-
 		}
 	}
 
@@ -567,7 +563,7 @@ func IsEndgame(board *Board) bool {
 func GetPieceTableValue(piece *Piece, EndGame bool) int {
 	var pos int8
 	if IsWhite(piece) {
-		pos = 64 - 8*piece.Y_Pos + piece.X_Pos
+		pos = 56 - 8*piece.Y_Pos + piece.X_Pos
 	} else {
 		pos = 8*piece.Y_Pos + piece.X_Pos
 	}
@@ -628,7 +624,7 @@ func NewBoard() *Board {
 	board.WhitePieces = append(board.WhitePieces, NewPiece('N', false, 1, 0))
 	board.WhitePieces = append(board.WhitePieces, NewPiece('N', false, 6, 0))
 	// white bishops
-	board.WhitePieces = append(board.WhitePieces, NewPiece('B', false, 3, 5))
+	board.WhitePieces = append(board.WhitePieces, NewPiece('B', false, 2, 0))
 	board.WhitePieces = append(board.WhitePieces, NewPiece('B', false, 5, 0))
 
 	// black pawns
@@ -652,24 +648,57 @@ func NewBoard() *Board {
 	return &board
 }
 
-func PrintBoard(board_ *Board) string {
-	Pieces := board_.WhitePieces
+func GetSymbol(name rune, player bool) rune {
+	if player {
+		switch name {
+		case 'P':
+			return '♙'
+		case 'N':
+			return '♘'
+		case 'B':
+			return '♗'
+		case 'R':
+			return '♖'
+		case 'Q':
+			return '♕'
+		case 'K':
+			return '♔'
+		}
+	} else {
+		switch name {
+		case 'P':
+			return '♟'
+		case 'N':
+			return '♞'
+		case 'B':
+			return '♝'
+		case 'R':
+			return '♜'
+		case 'Q':
+			return '♛'
+		case 'K':
+			return '♚'
+		}
+	}
+
+	return name
+}
+
+func PrintBoard(board_ *Board) {
 
 	var board [64]rune
 
 	for index, _ := range board {
-		board[index] = '■'
+		board[index] = '▭'
 
 	}
 
-	for _, element := range Pieces {
-		board[((7-element.Y_Pos)*8)+element.X_Pos] = element.Name
-
+	for _, element := range board_.WhitePieces {
+		board[((7-element.Y_Pos)*8)+element.X_Pos] = GetSymbol(element.Name, false)
 	}
 
-	Pieces = board_.BlackPieces
-	for _, element := range Pieces {
-		board[((7-element.Y_Pos)*8)+element.X_Pos] = element.Name
+	for _, element := range board_.BlackPieces {
+		board[((7-element.Y_Pos)*8)+element.X_Pos] = GetSymbol(element.Name, true)
 
 	}
 
@@ -678,11 +707,13 @@ func PrintBoard(board_ *Board) string {
 			fmt.Println()
 		}
 		fmt.Print(string(board[i]) + " ")
-
 	}
+}
 
-	return ""
-
+func PrintPieces(board *Board) {
+	for _, piece := range board.WhitePieces {
+		fmt.Println(string(piece.Name) + " " + strconv.Itoa(int(piece.X_Pos)) + "," + strconv.Itoa(int(piece.Y_Pos)))
+	}
 }
 func OutOfBounds(x int8, y int8) bool {
 	return x < 0 || y < 0 || x > 7 || y > 7
